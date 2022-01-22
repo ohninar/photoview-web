@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block section %}Upload{% endblock %}
+
+{% block main %}
+<form enctype="multipart/form-data">
+    <div class="mb-3">
+    <label for="name-upload" class="form-label">Name</label>
+    <input type="text" class="form-control" id="name-upload" aria-describedby="name" name="name">
+  </div>
+  <div class="mb-3">
+    <label for="file-upload" class="form-label">Email address</label>
+    <input type="file" class="form-control" id="file-upload" aria-describedby="file" name="email">
+  </div>
+  <button type="button" class="btn btn-primary" id="btn-upload">Submit</button>
+</form>
+{% endblock %}
+
+{% block scripts %}
+
+<script type="text/javascript">
+        $(document).ready(function() {
+            $("#btn-upload").click(function() {
+                var name = document.querySelector('input[type="text"]')
+                var file = document.querySelector('input[type="file"]')
+                const form = new FormData();
+
+                form.append("file", file.files[0]);
+                form.append("name", name.value);
+
+                const settings = {
+                    "async": true,
+                    "crossDomain": true,
+                    "url": "https://photoview-api.herokuapp.com/photos",
+                    "method": "POST",
+                    "headers": {
+                        "Authorization": "Bearer {{ session['token'] }}"
+                    },
+                    "processData": false,
+                    "contentType": false,
+                    "mimeType": "multipart/form-data",
+                    "data": form
+                };
+
+                $.ajax(settings).done(function (response) {
+                    console.log(response);
+                });
+            });
+        });
+    </script>
+
+{% endblock %}

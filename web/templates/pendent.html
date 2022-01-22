@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block section %} Pendent {% endblock %}
+
+{% block main %}
+<div class="row">
+  <div class="col-lg-4 col-md-12 mb-4 mb-lg-0">
+   {% for photo in list_photos %}
+    <img
+      src="{{ photo.uri }}"
+      class="w-100 shadow-1-strong rounded mb-4"
+    />
+      <button data-id="{{ photo.id }}" id="btn-pendent" class="btn btn-primary" role="button" data-bs-toggle="button">Authorize</button>
+   {% endfor %}
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#btn-pendent").click(function() {
+                var dataId = $(this).attr("data-id");
+                console.log(dataId)
+                $(this).remove();
+                const settings = {
+                    "async": true,
+                    "crossDomain": true,
+                    "url": "https://photoview-api.herokuapp.com/photos/"+dataId+"/authorized",
+                    "method": "PUT",
+                    "headers": {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer {{ session['token'] }}"
+                    },
+                    "processData": false,
+                    "data": ""
+                };
+
+                $.ajax(settings).done(function (response) {
+                    console.log(response);
+                });
+            });
+        });
+    </script>
+{% endblock %}

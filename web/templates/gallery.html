@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block section %} Gallery {% endblock %}
+
+{% block main %}
+<div class="row">
+  <div class="col-lg-4 col-md-12 mb-4 mb-lg-0">
+   {% for photo in list_photos %}
+    <img
+      src="{{ photo.uri }}"
+      class="w-100 shadow-1-strong rounded mb-4"
+    />
+    <div class="d-grid gap-2 d-md-block">
+        <input type="text" class="form-control" id="txt-comment-{{ photo.id }}" aria-describedby="comment-txt" name="comment" placeholder="comment here...">
+        <button data-id="{{ photo.id }}" name="btn-like" class="btn btn-primary" role="button" data-bs-toggle="button">Like</button>
+        <button data-id="{{ photo.id }}" name="btn-comment" class="btn btn-primary" role="button" data-bs-toggle="button">Comment</button><br>
+    </div>
+   {% endfor %}
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    var like_buttons = document.getElementsByName("btn-like");
+    var fn_like = function() {
+        var dataId = $(this).attr("data-id");
+        console.log(dataId)
+        $(this).remove();
+        const settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "https://photoview-api.herokuapp.com/photos/"+dataId+"/liked",
+            "method": "POST",
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer {{ session['token'] }}"
+            },
+            "processData": false,
+            "data": ""
+        };
+
+        $.ajax(settings).done(function (response) {
+            console.log(response);
+        });
+    };
+    Array.from(like_buttons).forEach(function(element) {
+      element.addEventListener('click', fn_like);
+    });
+
+    var comment_buttons = document.getElementsByName("btn-comment");
+    var fn_comment = function() {
+        var dataId = $(this).attr("data-id");
+        var text = document.getElementById("txt-comment-"+dataId).value;
+        $(this).remove();
+        document.getElementById("txt-comment-"+dataId).remove()
+        const settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": "https://photoview-api.herokuapp.com/photos/"+dataId+"/comment",
+            "method": "POST",
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer {{ session['token'] }}"
+            },
+            "processData": false,
+            "data": "{\"text\": \""+text+"\"}"
+        };
+
+        $.ajax(settings).done(function (response) {
+            console.log(response);
+        });
+    };
+    Array.from(comment_buttons).forEach(function(element) {
+      element.addEventListener('click', fn_comment);
+    });
+
+</script>
+{% endblock %}
